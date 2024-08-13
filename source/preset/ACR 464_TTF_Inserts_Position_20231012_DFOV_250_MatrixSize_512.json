@@ -1,0 +1,40 @@
+{
+	"type_of_file" : "TTF",
+	"phantom" : "ACR 464",
+	"measurement_date" : "20231012",
+	"DFOV" : 250.000000,
+	"width_in_pixel" : 512.000000,
+	"phantom_diameter" : 200.000000,
+	"commentaire" : "TTF - Inserts positions given in pixel",
+	"section" : {
+		"start" : 150.500000,
+		"stop" : 170.500000
+		},
+	 "insert" : [
+	{
+		"material" : "Air",
+		"X" : 350.618682,
+		"Y" : 345.572924,
+		"radius" : 25.392015
+		},
+	{
+		"material" : "Bone",
+		"X" : 349.601209,
+		"Y" : 164.458613,
+		"radius" : 25.376911
+		},
+	{
+		"material" : "Acrylic",
+		"X" : 169.377263,
+		"Y" : 346.815682,
+		"radius" : 25.687691
+		},
+	{
+		"material" : "Polyethylene",
+		"X" : 168.411651,
+		"Y" : 165.125135,
+		"radius" : 25.657827
+		}
+	]
+	
+	}

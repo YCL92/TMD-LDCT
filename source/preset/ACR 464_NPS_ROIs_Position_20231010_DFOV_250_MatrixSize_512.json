@@ -1,0 +1,36 @@
+{
+	"type_of_file" : "NPS",
+	"phantom" : "ACR 464",
+	"measurement_date" : "20231010",
+	"DFOV" : 250.000000,
+	"width_in_pixel" : 512.000000,
+	"phantom_diameter" : 200.000000,
+	"commentaire" : "NPS - ROI's position given in pixel",
+	"section" : {
+		"start" : 226.500000,
+		"stop" : 250.500000
+		},
+	 "ROI" : [
+	{
+		"X" : 148.000000,
+		"Y" : 145.000000,
+		"side_square" : 76.000000
+		},
+	{
+		"X" : 292.000000,
+		"Y" : 289.000000,
+		"side_square" : 76.000000
+		},
+	{
+		"X" : 148.000000,
+		"Y" : 289.000000,
+		"side_square" : 76.000000
+		},
+	{
+		"X" : 292.000000,
+		"Y" : 145.000000,
+		"side_square" : 76.000000
+		}
+	]
+	
+	}
