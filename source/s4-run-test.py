@@ -66,7 +66,7 @@ def runDenoise(study, opt):
     for t_idx, (ld_noise, ld_proj, fd_proj, rebin_w, theta, zloc) in tqdm(
         enumerate(test_loader), desc=study + "-denoise", total=len(test_loader)
     ):
-        # copy to device
+        # pre-processing
         ld_noise = t.swapaxes(ld_noise, 0, 1).to(opt.device)
         ld_proj = t.swapaxes(ld_proj, 0, 1).to(opt.device)
         fd_proj = t.swapaxes(fd_proj, 0, 1).to(opt.device)
@@ -96,7 +96,6 @@ def runDenoise(study, opt):
         zloc_buffer = zloc_buffer[-(buffer_size + 1) :]
 
         # weighted summation
-
         rebin_pred = t.sum(rebin_w * t.cat(pred_buffer, dim=0), dim=0)
         rebin_ld = t.sum(rebin_w * t.cat(ld_buffer[mid_idx : mid_idx + 2], dim=0), dim=0)
         rebin_fd = t.sum(rebin_w * t.cat(fd_buffer[mid_idx : mid_idx + 2], dim=0), dim=0)
@@ -106,7 +105,7 @@ def runDenoise(study, opt):
         rebin_ld = hpf.run(rebin_ld)
         rebin_fd = hpf.run(rebin_fd)
 
-        # gantry params
+        # get gantry params
         rebin_theta = theta_buffer[mid_idx]
         rebin_zloc = zloc_buffer[mid_idx]
 
@@ -166,7 +165,7 @@ def runRefine(study, opt):
     for index, (ld_noise, ld_img, fd_img, mask) in tqdm(
         enumerate(test_loader), desc=study + "-refine", total=len(test_loader)
     ):
-        # copy to device
+        # pre-processing
         ld_noise = ld_noise.to(opt.device)
         ld_img = ld_img.to(opt.device)
 

@@ -33,7 +33,7 @@ def calcMSE(src_img, tgt_img, wc, ww, mask):
     valid_mask = (tgt_img >= min_hu) * (tgt_img <= max_hu) * mask * ~nan_mask
     valid_mask = valid_mask.astype("float32")
 
-    # calculate mse
+    # compute mse
     mse = np.sum(valid_mask * (src_img - tgt_img) ** 2) / np.sum(valid_mask)
 
     return mse
@@ -52,7 +52,7 @@ def calcSSIM(src_img, tgt_img, wc, ww, mask):
     valid_mask = (tgt_img >= min_hu) * (tgt_img <= max_hu) * mask * ~nan_mask
     valid_mask = valid_mask.astype("float32")
 
-    # calculate ssim
+    # compute ssim
     _, ssim_map = structural_similarity(src_img, tgt_img, data_range=4095.0, full=True)
     ssim = np.sum(valid_mask * ssim_map) / np.sum(valid_mask)
 

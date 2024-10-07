@@ -38,7 +38,7 @@ class BasicModules(t.nn.Module):
         if save_dir is None:
             save_dir = "../checkpoint"
 
-        prefix = os.path.join("../checkpoint/" + self.model_name + "_")
+        prefix = os.path.join(save_dir + self.model_name + "_")
         file_path = time.strftime(prefix + "%m%d-%H%M%S.pth")
         t.save(self.state_dict(), file_path)
         print("Checkpoint saved: %s" % file_path)

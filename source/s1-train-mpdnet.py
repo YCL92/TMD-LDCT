@@ -31,7 +31,7 @@ def validate(model, val_loader, opt):
 
                 mid_proj, pred_noise = model(in_proj, in_noise, t_idx=t_idx)
 
-        # calculate rmse
+        # compute rmse
         pred_proj = mid_proj + pred_noise
         fd_proj = fd_projs[:, opt.buffer_size // 2, :, :, :]
         rmse = t.sqrt(t.nn.functional.mse_loss(pred_proj, fd_proj))
@@ -119,7 +119,6 @@ def main():
                 in_noise = ld_noise[:, t_idx, :, :, :]
                 in_proj = ld_projs[:, t_idx, :, :, :]
 
-                # inference
                 mid_proj, pred_noise = model(in_proj, in_noise, t_idx=t_idx)
 
             # compute loss

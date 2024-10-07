@@ -6,15 +6,14 @@ class Config:
 
     def __init__(self, mode="Test", manufacturer="Siemens"):
         # path to projection data, image data, results, and checkpoints
-        self.acr_dir = "/mnt/data/ACR_Phantom_Data"
-        self.proj_dir = "/mnt/data/LDCT-and-Projection-data"
-        self.img_dir = "/mnt/data/LDCT-Image-data"
-        # self.result_dir = "../result"
-        self.result_dir='/mnt/data/LDCT-Result-data'
+        self.acr_dir = "/mnt/share/data/ACR_Phantom_Data"
+        self.proj_dir = "/mnt/share/data/LDCT-and-Projection-data"
+        self.img_dir = "/mnt/share/data/LDCT-Image-data"
+        self.result_dir = "../result"
         self.checkpoint_dir = "../checkpoint"
         self.manufacturer = manufacturer
 
-        # model parameters for mpd-net
+        # mpd-net parameters
         if mode == "MPD-Net":
             self.patch_size = (64, 64)  # projection patch size
             self.n_frames = 3  # frame sequence length
@@ -26,7 +25,7 @@ class Config:
             self.n_val_samples = 128  # number of samples for validation
             self.val_freq = 1000  # validation frequency (iterations)
 
-        # model parameters for mir-net
+        # mir-net parameters
         elif mode == "MIR-Net":
             self.patch_size = (128, 128)  # image patch size
             self.n_frames = 7  # frame sequence length
@@ -34,7 +33,7 @@ class Config:
             self.lr_decay = 0.1  # learning rate decay
             self.max_epoch = 500  # maximum epoch index
 
-        # model parameters for testing
+        # testing parameters
         elif mode == "Test":
             self.n_frames_mpd = 3  # frame sequence length for MPD-Net
             self.n_frames_mir = 7  # frame sequence length for MIR-Net
@@ -43,7 +42,7 @@ class Config:
         else:
             raise NotImplementedError("Unknown mode: %s" % mode)
 
-        # partition of training, validation, and testing
+        # studies used for training, validation, and testing
         if self.manufacturer == "Siemens":
             train_list = [
                 "L004", "L006", "L019", "L033", "L057", "L064", "L071", "L072", "L081", "L107",
@@ -86,6 +85,6 @@ class Config:
         # other shared parameters
         self.seed = 282050419277614211  # random seed
         self.batch_size = 16  # mini-batch size
-        self.num_workers = 1  # parallel cores
+        self.num_workers = 0  # parallel cores
         self.device = device("cuda" if is_available() else "cpu")  # use cuda if available
         self.recon_filter = "shepp-logan"  # ramp, shepp-logan, cosine, hamming, or hann

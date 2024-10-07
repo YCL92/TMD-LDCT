@@ -22,12 +22,12 @@ ssim_results = {method: [] for method in method_list}
 for study in tqdm(study_list, total=len(study_list)):
     for method in method_list:
         # find all files
-        file_list = [item for item in os.listdir(os.path.join("../result", "baseline", study)) if "pkl" in item]
+        file_list = [item for item in os.listdir(os.path.join(opt.result_dir, "baseline", study)) if "pkl" in item]
         file_list.sort()
 
         for file_name in file_list:
             # baseline images
-            file_path = os.path.join("../result", "baseline", study, file_name)
+            file_path = os.path.join(opt.result_dir, "baseline", study, file_name)
             with open(file_path, "rb") as file:
                 all_data = load(file)
 
@@ -38,11 +38,11 @@ for study in tqdm(study_list, total=len(study_list)):
             if "baseline" in method:
                 pred_data = ld_data
             else:
-                file_path = os.path.join("../result", method, study, file_name)
+                file_path = os.path.join(opt.result_dir, method, study, file_name)
                 with open(file_path, "rb") as file:
                     pred_data = load(file)
 
-            # calculate errors
+            # compute error
             mse_results[method].append(calcMSE(pred_data, fd_data, wc, ww, mask))
             ssim_results[method].append(calcSSIM(pred_data, fd_data, wc, ww, mask))
 

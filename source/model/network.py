@@ -96,11 +96,11 @@ class ResUnet(BasicModules):
         # head features
         feats0 = self.head(x)
 
-        # downsampling
+        # down-sampling
         feats1 = self.encode1(feats0)
         feats2 = self.encode2(feats1)
 
-        # upsampling
+        # up-sampling
         feats2 = self.decode2(feats2)
         feats1 = self.decode1(self.mix_up2(feats1, feats2))
 
@@ -250,11 +250,11 @@ class MIRNet(BasicModules):
         # head features
         feats0 = self.head(x)
 
-        # downsampling
+        # down-sampling
         feats1 = self.encode1(feats0)
         feats2 = self.encode2(feats1)
 
-        # upsampling
+        # up-sampling
         feats2 = self.decode2(feats2)
         feats1 = self.decode1(self.mix_up2(feats1, feats2))
 

@@ -23,6 +23,8 @@ If you find it useful in your research, please consider citing the following pap
 
 2024-08-13: We have verified the GE section and uploaded the pre-trained weights.
 
+2024-10-07: We have verified the Siemens section and uploaded the pre-trained weights.
+
 
 
 ### Introduction
@@ -45,7 +47,7 @@ TBA
 
 ------
 
-Follow the following instructions step by step to train the model from scratch. Or you can skip steps 3-5 to perform evaluations on patient data or phantom directly using the pre-trained models. 
+Follow the instructions step by step to train the model from scratch. Or you can skip steps 3-5 to perform evaluations on patient data or phantom directly using the pre-trained models. 
 
 
 
@@ -69,14 +71,14 @@ After that, update the patient dataset directory `proj_dir`, the phantom dataset
 
 ##### *(optional) The CT Reconstruction Pipeline 
 
-If you are interested in the conventional CT image reconstruction pipeline (adopted and modified from the [FreeCT project](https://github.com/FreeCT/FreeCT) originally in C++ and R), run the following:
+If you are interested in the conventional CT image reconstruction pipeline from scratch (partially adopted and modified from the [FreeCT project](https://github.com/FreeCT/FreeCT) originally in C++ and R), run the following:
 
 ```bash
-python recon-ge.py # for GE studies
-python recon-siemens # for Siemens studies
+python recon-ge.py # for GE studies w/o FFS
+python recon-siemens # for Siemens studies w/ FFS
 ```
 
-The reconstruction results will be stored as DICOM files under `./result`.
+The reconstruction results will be saved as DICOM files under `./result`, they can be opened by DICOM viewers (tested on [MicroDicom](https://www.microdicom.com/)).
 
 
 
@@ -96,7 +98,7 @@ python rebin-ge.py # for GE studies
 python rebin-siemens.py # for Siemens studies
 ```
 
-The above commands will generate lots of small files that occupy plenty of space, make sure you have at least 1.7TB of free disk space.
+The above commands will generate tons of small files that occupy plenty of space, make sure you have at least **1.7TB** of free disk space.
 
 
 
@@ -108,7 +110,7 @@ To train MPD-Net, specify the scanner model (either `manufacturer = Siemens` or 
 python s1-train-mpdnet.py
 ```
 
-On our computer, the training takes a few days to complete. We notice some bugs when setting `num_workers > 1` on another machine with a different hardware setup, you may modify this parameter if it works.
+On our computer, the training takes a few days to complete. We notice some bugs when setting `num_workers > 1` on another machine with a different hardware setup, you may modify as needed.
 
 
 
@@ -120,7 +122,7 @@ When the training of MPD-Net is completed, generate the reconstructed image data
 python s2-prep-recon.py
 ```
 
-Wait until the image-domain dataset is well-prepared. This will take hours depending on your hardware, if you are running out of space at this step, you can safely delete the projection files used to train MPD-Net.
+Wait until the image-domain dataset is well-prepared. This will take hours depending on your hardware configuration, if you are running out of space at this step, you can safely delete the projection files used to train MPD-Net **AFTER** reconstruction.
 
 
 
@@ -138,7 +140,7 @@ On our computer, the training takes about 12 hours to complete.
 
 #### 6. Evaluation of Patient Data
 
-When all the training is completed, run the line below to evaluate the test set (change the manufacturer in `./preset/config.py` if needed):
+When all the training is completed, run the line below to evaluate the test set (change the manufacturer in `./preset/config.py` if needed, only valid if you use our provided weights):
 
 ```bash
 python s4-run-test.py
@@ -150,7 +152,7 @@ Wait until all the test data is processed, then run the line below to print quan
 python eval-testset.py
 ```
 
-Due to the update of the reconstruction code and the GPU differences you will observe slightly different numbers.
+Due to the update of the reconstruction code and the GPU differences you will observe slightly different numbers than those reported in the paper.
 
 
 
@@ -169,3 +171,4 @@ The CT phantom evaluation tool is available at [iQMetrix-CT](https://github.com/
 
 ./preset/ACR 464_TTF_Inserts_Position_20231012_DFOV_250_MatrixSize_512.json
 ```
+

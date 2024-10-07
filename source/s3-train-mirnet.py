@@ -48,14 +48,14 @@ def validate(model, val_loader, opt):
         fd_imgs = fd_imgs.to(opt.device)
         masks = masks.to(opt.device)
 
-        # ground-truth
+        # get ground-truth
         fd_img = fd_imgs[:, opt.n_frames // 2, :, :, :]
 
         # run model
         with t.no_grad():
             mid_img, pred_noise = model(ld_imgs, ld_noise)
 
-        # calculate PSNR
+        # compute PSNR
         pred_img = mid_img + pred_noise
         psnr = calcPSNR(1000.0 * pred_img, 1000.0 * fd_img, masks)
         psnr_list.append(psnr)
