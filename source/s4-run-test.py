@@ -1,14 +1,14 @@
 import os
 import shutil
-from pickle import load, dump, HIGHEST_PROTOCOL
+from pickle import HIGHEST_PROTOCOL, dump, load
 
 import torch as t
 from tqdm import tqdm
 
-from model.network import MPDNet, MIRNet
+from model.network import MIRNet, MPDNet
 from preset.config import Config
-from util.dataloader import TestProjSet, TestImgSet
-from util.dicomio import loadProjMetadata, loadImgMetadata
+from util.dataloader import TestImgSet, TestProjSet
+from util.dicomio import loadImgMetadata, loadProjMetadata
 from util.reconutil import FFTFilter, rebin, rebinFFS, recon
 
 
@@ -223,16 +223,16 @@ def main():
     study_list.sort()
 
     for study in study_list:
-        # step 1: projection rebinning
+        # projection rebinning
         runRebin(study, opt)
 
-        # step 2: projection denoising
+        # projection denoising
         runDenoise(study, opt)
 
-        # step 3: image reconstruction
+        # image reconstruction
         runRecon(study, opt)
 
-        # step 4: image refinement
+        # image refinement
         runRefine(study, opt)
 
         # clean up

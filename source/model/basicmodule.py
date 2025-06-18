@@ -22,12 +22,16 @@ class BasicModules(t.nn.Module):
         save_list.sort()
 
         file_path = os.path.join(save_dir, save_list[index])
-        state_dict = t.load(file_path, map_location=next(self.parameters()).device)
+        state_dict = t.load(file_path, map_location=next(self.parameters()).device, weights_only=True)
         self.load_state_dict(state_dict)
         print("Checkpoint loaded: %s" % file_path)
 
     def loadPartialDict(self, file_path):
-        pretrained_dict = t.load(file_path, file_path, map_location=next(self.parameters()).device)
+        pretrained_dict = t.load(
+            file_path,
+            map_location=next(self.parameters()).device,
+            weights_only=True,
+        )
         model_dict = self.state_dict()
         pretrained_dict = {key: value for key, value in pretrained_dict.items() if key in model_dict}
         model_dict.update(pretrained_dict)

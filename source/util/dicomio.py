@@ -84,7 +84,8 @@ def getSiemensProjMeta(data_dir, file_list):
 
     # fixed params calculation
     kc = n_chnls - cen_eles[0]  # central channel
-    kr = cen_eles[1] - 1  # central row
+    kr = cen_eles[1]  # central row
+    # kr = cen_eles[1] - 1  # central row
     delta_beta = 2 * np.arcsin(
         0.5 * np.frombuffer(file[0x7029, 0x1002].value, dtype="float32")[0] / r_fd
     )  # fan angle increment
@@ -321,16 +322,16 @@ def save2Dicom(img, img_idx, img_md, save_path, desc=""):
     ds.Columns = img.shape[1]
     ds.PixelSpacing = img_md["PixelSpacing"]
     ds.BitsAllocated = 16
-    ds.BitsStored = 16
-    ds.HighBit = 15
+    ds.BitsStored = 12
+    ds.HighBit = 11
     ds.PixelRepresentation = 0
 
     # display attributes
     ds.WindowCenter = img_md["WindowCenter"]
     ds.WindowWidth = img_md["WindowWidth"]
     ds.WindowCenterWidthExplanation = ""
-    ds.RescaleIntercept = "-1024.0"
-    ds.RescaleSlope = "1.0"
+    ds.RescaleIntercept = "-1024"
+    ds.RescaleSlope = "1"
 
     # time attributes
     dt = datetime.now()

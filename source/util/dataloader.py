@@ -579,8 +579,9 @@ class ACRImgSet(data.Dataset):
 
         noise = t.tensor(file_data["noise"])
         img = t.tensor(file_data["img"])
+        mask = t.tensor(file_data["mask"])
 
-        return noise, img
+        return noise, img, mask
 
     def __len__(self):
         return len(self.sample_list)

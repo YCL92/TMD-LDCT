@@ -1,23 +1,21 @@
 # Cross-domain Denoising for Low-dose Multi-frame Spiral Computed Tomography
 
-
-
-
 If you find it useful in your research, please consider citing the following paper:
 
 > ```tex
 > @ARTICLE{10538291,
->   author={Lu, Yucheng and Xu, Zhixin and Choi, Moon Hyung and Kim, Jimin and Jung, Seung-Won},
+>   author={Lu, Yucheng and Xu, Zhixin and Hyung Choi, Moon and Kim, Jimin and Jung, Seung-Won},
 >   journal={IEEE Transactions on Medical Imaging}, 
->   title={Cross-domain Denoising for Low-dose Multi-frame Spiral Computed Tomography}, 
+>   title={Cross-Domain Denoising for Low-Dose Multi-Frame Spiral Computed Tomography}, 
 >   year={2024},
->   volume={},
->   number={},
->   pages={1-1},
+>   volume={43},
+>   number={11},
+>   pages={3949-3963},
+>   keywords={Image reconstruction;Noise reduction;Computed tomography;Noise;Image denoising;Optimization;Spirals;Deep learning;low-dose computed tomography;image and video denoising},
 >   doi={10.1109/TMI.2024.3405024}}
 > ```
 
-
+### 
 
 ### Updates:
 
@@ -25,7 +23,9 @@ If you find it useful in your research, please consider citing the following pap
 
 2024-10-07: We have verified the Siemens section and uploaded the pre-trained weights.
 
+2025-06-17: We have verified the Phantom section and updated the scripts accordingly.
 
+### 
 
 ### Introduction
 
@@ -36,12 +36,6 @@ The main contributions of this work are as follows:
 - We model each stage's physical properties of noise and artifacts based on the data acquisition process in the reconstruction pipeline. This design improves the denoising performance and gives end-users richer interpretation ability and transparency.
 
 - We demonstrate through experiments on patient data that our method significantly outperforms existing works both quantitatively and qualitatively. An extensive analysis of phantom scans further supports that the proposed method has achieved state-of-the-art performance.
-
-  
-
-### System Requirements
-
-TBA
 
 
 
@@ -69,13 +63,13 @@ After that, update the patient dataset directory `proj_dir`, the phantom dataset
 
 
 
-##### *(optional) The CT Reconstruction Pipeline 
+##### *(optional) The CT Reconstruction Pipeline
 
 If you are interested in the conventional CT image reconstruction pipeline from scratch (partially adopted and modified from the [FreeCT project](https://github.com/FreeCT/FreeCT) originally in C++ and R), run the following:
 
 ```bash
 python recon-ge.py # for GE studies w/o FFS
-python recon-siemens # for Siemens studies w/ FFS
+python recon-siemens.py # for Siemens studies w/ FFS
 ```
 
 The reconstruction results will be saved as DICOM files under `./result`, they can be opened by DICOM viewers (tested on [MicroDicom](https://www.microdicom.com/)).
@@ -88,7 +82,7 @@ After the dataset preparation is completed, apply pre-processing to the whole da
 
 ```bash
 python prepare-dataset.py # for the main dataset
-python prepare-phantom # for the phantom scan
+python prepare-phantom.py # for the phantom scan
 ```
 
 Then run the rebinning:
@@ -152,13 +146,25 @@ Wait until all the test data is processed, then run the line below to print quan
 python eval-testset.py
 ```
 
-Due to the update of the reconstruction code and the GPU differences you will observe slightly different numbers than those reported in the paper.
+Due to the update of the reconstruction code and the GPU differences you will observe slightly different values than those reported in the paper.
 
 
 
 #### 7. Evaluation of Phantom Data
 
-TBA
+Download `ACR_Phantom_Data.zip` from [The 2016 AAPM Grand Challenge](https://aapm.app.box.com/s/eaw4jddb53keg1bptavvvd1sf4x3pe9h) and unzip to `acr_dir` in `./preset/config.py`. Then run the following to prepare the phantom data:
+
+```bash
+python prepare-phantom.py
+```
+
+After that, run the following to get the results:
+
+```bash
+python eval-phantom.py
+```
+
+The above script will print out the statistical evaluation results in terms of MSE and SSIM, and save the corresponding images in DICOM format for further analysis.
 
 
 
@@ -171,4 +177,3 @@ The CT phantom evaluation tool is available at [iQMetrix-CT](https://github.com/
 
 ./preset/ACR 464_TTF_Inserts_Position_20231012_DFOV_250_MatrixSize_512.json
 ```
-

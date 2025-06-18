@@ -12,7 +12,7 @@ method_list = ["baseline", "prediction"]
 wc = 40.0
 ww = 300.0
 
-opt = Config(mode="Test")
+opt = Config(mode="Test", manufacturer="Siemens")
 study_list = opt.test_list
 study_list.sort()
 
@@ -54,4 +54,4 @@ for method in method_list:
     ssim_avg = np.mean(ssim_results[method])
     ssim_std = np.std(ssim_results[method])
 
-    print("%s & $%.2f\pm%.2f$ & $%.4f\pm%.4f$" % (method, mse_avg, mse_std, ssim_avg, ssim_std))
+    print("Results of %s, MSE: %.2f±%.2f, SSIM: %.4f±%.4f" % (method, mse_avg, mse_std, ssim_avg, ssim_std))

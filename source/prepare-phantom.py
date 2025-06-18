@@ -1,6 +1,6 @@
 import os
 import zipfile
-from pickle import dump, HIGHEST_PROTOCOL
+from pickle import HIGHEST_PROTOCOL, dump
 from shutil import move, rmtree
 
 import numpy as np
@@ -9,7 +9,7 @@ from pydicom import dcmread
 from tqdm import tqdm
 
 from preset.config import Config
-from util.dicomio import getSiemensProjMeta, getImgMeta, loadProjMetadata
+from util.dicomio import getImgMeta, getSiemensProjMeta, loadProjMetadata
 from util.reconutil import Interp2
 
 
@@ -35,23 +35,11 @@ def rebinACR(data_dir, proj_md, device="cpu", desc=""):
     interp_fs1 = Interp2(fs1_grid, offset=grid_offsets, data_size=[n_chnls, proj_offset_full + 1])
     params = {
         "manufacturer": "Siemens",
-        "ds": proj_md["ds"],
+        "ds": proj_md["ds"].cpu().numpy().astype("float32"),
         "shape": (n_rows, int(2 * n_chnls)),
         "fs0_w": interp_fs0.getWeights().cpu().numpy().astype("float32"),
         "fs1_w": interp_fs1.getWeights().cpu().numpy().astype("float32"),
     }
-
-    # extract rebined metadata
-    params["projs"] = []
-    for r_idx in range(proj_offset_full, n_projs):
-        # read from file
-        file = dcmread(os.path.join(data_dir, "fs0", "%06d.dcm" % (r_idx - proj_offset)))
-        f_name = "%06d.pkl" % r_idx
-        rebin_theta = np.frombuffer(file[0x7031, 0x1001].value, dtype="float32").item()
-        rebin_zloc = -np.frombuffer(file[0x7031, 0x1002].value, dtype="float32").item()  # negative z coordinate
-
-        # add rebinning params to the list
-        params["projs"].append((f_name, rebin_theta, rebin_zloc))
 
     # write to file
     save_path = os.path.join(data_dir, "../", desc + "-rebin-params.pkl")
@@ -97,21 +85,21 @@ def rebinACR(data_dir, proj_md, device="cpu", desc=""):
             continue
 
         # rebinning
-        rebin_data0 = interp_fs0.run(raw_data0)
-        rebin_noise0 = interp_fs0.run(raw_noise0)
-        rebin_data1 = interp_fs1.run(raw_data1)
-        rebin_noise1 = interp_fs1.run(raw_noise1)
+        rebin_data0 = interp_fs0.run(raw_data0).squeeze()
+        rebin_noise0 = interp_fs0.run(raw_noise0).squeeze()
+        rebin_data1 = interp_fs1.run(raw_data1).squeeze()
+        rebin_noise1 = interp_fs1.run(raw_noise1).squeeze()
 
         # read other params
         file = dcmread(os.path.join(data_dir, "fs0", "%06d.dcm" % (r_idx - proj_offset)))
         rebin_theta = np.frombuffer(file[0x7031, 0x1001].value, dtype="float32").item()
-        rebin_zloc = np.frombuffer(file[0x7031, 0x1002].value, dtype="float32").item()
+        rebin_zloc = -np.frombuffer(file[0x7031, 0x1002].value, dtype="float32").item()  # reversed z coordinate
 
         save_data = {
-            "rebin_data0": rebin_data0.squeeze().cpu().numpy().astype("float32"),
-            "rebin_data1": rebin_data1.squeeze().cpu().numpy().astype("float32"),
-            "rebin_noise0": rebin_noise0.squeeze().cpu().numpy().astype("float32"),
-            "rebin_noise1": rebin_noise1.squeeze().cpu().numpy().astype("float32"),
+            "rebin_data0": rebin_data0.cpu().numpy().astype("float16"),
+            "rebin_data1": rebin_data1.cpu().numpy().astype("float16"),
+            "rebin_noise0": rebin_noise0.cpu().numpy().astype("float32"),
+            "rebin_noise1": rebin_noise1.cpu().numpy().astype("float32"),
             "rebin_theta": rebin_theta,
             "rebin_zloc": rebin_zloc,
         }

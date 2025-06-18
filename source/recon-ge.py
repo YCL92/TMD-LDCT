@@ -213,12 +213,12 @@ for study in study_list:
 
     # RECONSTRUCTION STARTS HERE
     for series in ["full-dose", "low-dose"]:
-        # step 1&2: rebin then apply filtering
+        # rebin and apply filtering
         data_dir = os.path.join(opt.proj_dir, study, series + "-projs")
         save_dir = os.path.join(opt.result_dir, study, series + "-temp")
         rebinNFilter(data_dir, save_dir, proj_md, opt.recon_filter, opt.device)
 
-        # step 3: back-projection
+        # back-projection
         data_dir = os.path.join(opt.result_dir, study, series + "-temp")
         save_dir = os.path.join(opt.result_dir, study, series + "-imgs")
         backProjRecon(data_dir, save_dir, proj_md, img_md, opt.device, desc=series)

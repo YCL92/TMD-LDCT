@@ -1,6 +1,6 @@
 import os
 import shutil
-from pickle import load, dump, HIGHEST_PROTOCOL
+from pickle import HIGHEST_PROTOCOL, dump, load
 
 import torch as t
 from tqdm import tqdm
@@ -8,7 +8,7 @@ from tqdm import tqdm
 from model.network import MPDNet
 from preset.config import Config
 from util.dataloader import TestProjSet
-from util.dicomio import loadProjMetadata, loadImgMetadata
+from util.dicomio import loadImgMetadata, loadProjMetadata
 from util.reconutil import FFTFilter, recon
 
 
@@ -90,16 +90,17 @@ def runDenoise(study, opt):
         rebin_zloc = zloc_buffer[mid_idx]
 
         # save to file
-        save_dict = {
-            "noise": rebin_pred.cpu(),
-            "ld": rebin_ld.cpu(),
-            "fd": rebin_fd.cpu(),
-            "theta": rebin_theta,
-            "zloc": rebin_zloc,
+        proj_path = os.path.join(save_path, "%06d.pkl" % (t_idx - 1 - mid_idx))
+        out_data = {
+            "noise": rebin_pred.cpu().numpy().astype("float32"),
+            "ld": rebin_ld.cpu().numpy().astype("float32"),
+            "fd": rebin_fd.cpu().numpy().astype("float32"),
+            "theta": rebin_theta.numpy(),
+            "zloc": rebin_zloc.numpy(),
         }
 
-        with open(os.path.join(save_path, "%06d.pkl" % (t_idx - 1 - mid_idx)), "wb") as file:
-            dump(save_dict, file, protocol=HIGHEST_PROTOCOL)
+        with open(proj_path, "wb") as file:
+            dump(out_data, file, protocol=HIGHEST_PROTOCOL)
 
 
 # image reconstruction
@@ -130,10 +131,10 @@ def main():
 
     # process each study
     for study in study_list:
-        # step 1: projection denoising
+        # projection denoising
         runDenoise(study, opt)
 
-        # step 2: image reconstruction
+        # image reconstruction
         runRecon(study, opt)
         shutil.rmtree(os.path.join(opt.img_dir, study, "denoise-projs"))
 

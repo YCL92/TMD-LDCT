@@ -1,11 +1,11 @@
 import os
-from pickle import load, dump, HIGHEST_PROTOCOL
+from pickle import HIGHEST_PROTOCOL, dump, load
 
 import numpy as np
 import torch as t
 from pydicom import dcmread
 from skimage.transform.radon_transform import _get_fourier_filter
-from torch.nn.functional import pad, grid_sample, relu
+from torch.nn.functional import grid_sample, pad, relu
 from tqdm import tqdm
 
 
@@ -140,7 +140,8 @@ def rebin(data_dir, save_dir, proj_md, device="cpu", desc=""):
         rebin_zloc = np.frombuffer(file[0x7031, 0x1002].value, dtype="float32").item()
 
         # write to file
-        save_data = {
+        proj_path = os.path.join(save_dir, "%06d.pkl" % r_idx)
+        out_data = {
             "rebin_ld_data": rebin_ld_data.cpu().numpy().astype("float16"),
             "rebin_ld_noise": rebin_ld_noise.cpu().numpy().astype("float32"),
             "rebin_fd_data": rebin_fd_data.cpu().numpy().astype("float16"),
@@ -148,8 +149,8 @@ def rebin(data_dir, save_dir, proj_md, device="cpu", desc=""):
             "rebin_theta": rebin_theta,
             "rebin_zloc": rebin_zloc,
         }
-        with open(os.path.join(save_dir, "%06d.pkl" % r_idx), "wb") as file:
-            dump(save_data, file, protocol=HIGHEST_PROTOCOL)
+        with open(proj_path, "wb") as file:
+            dump(out_data, file, protocol=HIGHEST_PROTOCOL)
 
 
 # rebinning (with flying focal spots)
@@ -256,9 +257,11 @@ def rebinFFS(data_dir, save_dir, proj_md, device="cpu", desc=""):
         # read other params
         file = dcmread(os.path.join(data_dir, "full-dose-projs", "fs0", "%06d.dcm" % (r_idx - proj_offset)))
         rebin_theta = np.frombuffer(file[0x7031, 0x1001].value, dtype="float32").item()
-        rebin_zloc = -np.frombuffer(file[0x7031, 0x1002].value, dtype="float32").item()  # flip z coordinate
+        rebin_zloc = -np.frombuffer(file[0x7031, 0x1002].value, dtype="float32").item()  # reverse z coordinates
 
-        save_data = {
+        # write to file
+        proj_path = os.path.join(save_dir, "%06d.pkl" % r_idx)
+        out_data = {
             "rebin_ld_data0": rebin_ld_data0.cpu().numpy().astype("float16"),
             "rebin_ld_data1": rebin_ld_data1.cpu().numpy().astype("float16"),
             "rebin_ld_noise0": rebin_ld_noise0.cpu().numpy().astype("float32"),
@@ -271,9 +274,8 @@ def rebinFFS(data_dir, save_dir, proj_md, device="cpu", desc=""):
             "rebin_zloc": rebin_zloc,
         }
 
-        # write to file
-        with open(os.path.join(save_dir, "%06d.pkl" % r_idx), "wb") as file:
-            dump(save_data, file, protocol=HIGHEST_PROTOCOL)
+        with open(proj_path, "wb") as file:
+            dump(out_data, file, protocol=HIGHEST_PROTOCOL)
 
 
 # back-projection
@@ -298,7 +300,6 @@ def recon(data_dir, save_dir, proj_md, img_md, n_interp=None, device="cpu", desc
     rfov = float(img_md["ReconstructionDiameter"])
     afov = float(img_md["DataCollectionDiameter"])
     thickness = float(img_md["SliceThickness"])
-    n_rebin_chnls = int(2 * proj_md["n_chnls"])
 
     if proj_md["manufacturer"] == "Siemens":
         n_projs_pi = int(proj_md["n_projs_2pi"] / 4)
@@ -411,5 +412,6 @@ def recon(data_dir, save_dir, proj_md, img_md, n_interp=None, device="cpu", desc
             "fd": fd_img.cpu().numpy(),
             "mask": out_mask.cpu().numpy(),
         }
+
         with open(img_path, "wb") as file:
             dump(out_data, file, protocol=HIGHEST_PROTOCOL)

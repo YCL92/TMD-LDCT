@@ -104,7 +104,7 @@ def rebinNFilter(data_dir, save_dir, proj_md, flt_kernel, device):
         # extra metadata
         file = dcmread(os.path.join(data_dir, "fs0", "%06d.dcm" % (r_idx - proj_md["proj_offset"])))
         rebin_theta = np.frombuffer(file[0x7031, 0x1001].value, dtype="float32").item()
-        rebin_zloc = -np.frombuffer(file[0x7031, 0x1002].value, dtype="float32").item()  # negative z coordinate
+        rebin_zloc = -np.frombuffer(file[0x7031, 0x1002].value, dtype="float32").item()  # reverse z coordinates
         f_name = "%06d.pkl" % r_idx
         param_list.append((f_name, rebin_theta, rebin_zloc))
 
@@ -228,12 +228,12 @@ for study in study_list:
 
     # RECONSTRUCTION STARTS HERE
     for series in ["full-dose", "low-dose"]:
-        # step 1&2: rebin then apply filtering
+        # rebin and apply filtering
         data_dir = os.path.join(opt.proj_dir, study, series + "-projs")
         save_dir = os.path.join(opt.result_dir, study, series + "-temp")
         rebinNFilter(data_dir, save_dir, proj_md, opt.recon_filter, opt.device)
 
-        # step 3: back-projection
+        # back-projection
         data_dir = os.path.join(opt.result_dir, study, series + "-temp")
         save_dir = os.path.join(opt.result_dir, study, series + "-imgs")
         backProjRecon(data_dir, save_dir, proj_md, img_md, opt.device, desc=series)
